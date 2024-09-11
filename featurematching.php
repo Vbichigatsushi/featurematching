@@ -84,23 +84,32 @@ class Featurematching extends Module
     {
         // get existing form
         $formBuilder = $params['form_builder'];
+        $categoryId = $params['id'];
+        // Retrieve the previously saved selections for this category
+        $savedFeatures = $this->getCategoryFeatures($categoryId);
 
         $featureGroups = $this->getAllFeatureGroup();
         foreach ($featureGroups as $group) {
             $features = $this->getFeatureByGroup($group['id_feature_group']);
             $choices = [];
+            $selected = [];
 
             foreach ($features as $feature) {
                 // Correctly adding each feature to the choices array
-                $choices[$feature['name']] = $feature['id_feature'];
+                $choices[$feature['name']] = (int) $feature['id_feature'];
+                // Check if this feature was selected before
+                if (in_array((int) $feature['id_feature'], $savedFeatures)) {
+                    $selected[] = (int) $feature['id_feature'];
+                }
             }
 
             // Add a new custom field with the correct choices
-            $formBuilder->add("feature_" . strtolower($group['name']), \Symfony\Component\Form\Extension\Core\Type\ChoiceType::class, [
+            $formBuilder->add(strtolower($group['name']), \Symfony\Component\Form\Extension\Core\Type\ChoiceType::class, [
                 'choices' => $choices,
                 'label' => $group['name'],
                 'multiple' => true,  // Allow multiple selections
                 'expanded' => true,  // Use checkboxes
+                'data' => $selected, // Set default values
                 'attr' => [
                     'class' => 'form-control', // Optional: add CSS classes
                 ],
@@ -121,31 +130,54 @@ class Featurematching extends Module
     protected function processCategoryFormData($params)
     {
         $categoryId = (int) $params['category']->id;
+        $featureGroups = $this->getAllFeatureGroup();
         $customFields = Tools::getAllValues();
+        $featureGroupKeys = [];
+
+        // Prepare an array of feature group keys
+        foreach ($featureGroups as $group) {
+            $featureGroupKeys[] = strtolower($group['name']);
+        }
+
+        $oldFeatures = $this->getCategoryFeatures($categoryId);
+        $newFeatures = [];
 
         if (isset($customFields['category']) && is_array($customFields['category'])) {
-            PrestaShopLogger::addLog(json_encode($customFields['category']));
             foreach ($customFields['category'] as $subgroupKey => $subgroupValue) {
-                // check if subgroup start by "feature"
-                if (strpos($subgroupKey, 'feature') === 0) {
+                // Check if subgroupKey is a valid feature group
+                if (in_array($subgroupKey, $featureGroupKeys)) {
                     if (isset($customFields['category'][$subgroupKey])) {
-                        // foreach feature selected, save it
+                        // For each selected feature, save it
                         foreach ($customFields['category'][$subgroupKey] as $featureId) {
-                            $this->saveFeatureCategory($categoryId, $featureId);
+                            $newFeatures[] = $featureId;
+                            if (!in_array($featureId, $oldFeatures)) {
+                                $this->saveFeatureCategory($categoryId, $featureId);
+                            }
                         }
                     }
                 }
+            }
+
+            $featuresToRemove = array_diff($oldFeatures, $newFeatures);
+
+            foreach ($featuresToRemove as $featureId) {
+                $this->removeFeatureCategory($categoryId, $featureId);
             }
         }
     }
 
 
-    protected function saveFeatureCategory($categoryId, $featureId)
+    protected function saveFeatureCategory($categoryId, $featureId): bool
     {
         return Db::getInstance()->insert('fm_feature_category', [
             'id_feature' => (int) $featureId,
             'id_category' => (int) $categoryId,
         ]);
+    }
+
+    protected function removeFeatureCategory($categoryId, $featureId): bool
+    {
+        return Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'fm_feature_category WHERE id_category = ' . (int) $categoryId . ' AND id_feature = ' . (int) $featureId);
     }
 
     protected function getAllFeatureGroup(): array
@@ -158,9 +190,11 @@ class Featurematching extends Module
         return Db::getInstance()->executeS("SELECT * FROM ps_fm_feature WHERE id_feature_group = $featureGroupId");
     }
 
-    protected function setFeatureCategory($id_category)
+    protected function getCategoryFeatures($categoryId): array
     {
-        return; /* Db::getInstance()->executeS("SELECT * FROM ps_fm_feature_category WHERE id_category = $id_category"); */
+        // array of id_feature
+        return array_map(function ($feature) {
+            return $feature['id_feature'];
+        }, Db::getInstance()->executeS("SELECT id_feature FROM ps_fm_feature_category WHERE id_category = $categoryId"));
     }
-
 }
