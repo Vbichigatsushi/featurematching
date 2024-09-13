@@ -67,6 +67,10 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'fm_feature_product` (
     REFERENCES `' . _DB_PREFIX_ . 'product` (`id_product`) ON DELETE CASCADE
 ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
+$sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'fm_feature_product` ADD UNIQUE(`id_feature`, `id_product`);';
+
+$sql[] = 'ALTER TABLE `' . _DB_PREFIX_ . 'fm_feature_category` ADD UNIQUE(`id_feature`, `id_category`);';
+
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {
         return false;

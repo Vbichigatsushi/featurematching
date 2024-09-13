@@ -41,10 +41,11 @@ class Featurematching extends Module
 
         parent::__construct();
 
-        $this->displayName = $this->l('Feature Matching');
-        $this->description = $this->l('Feature Matching');
+        $this->displayName = $this->trans("Feature Matching", [], 'Modules.Featurematching.Admin');
+        $this->description = $this->trans("Allows you to associate products with categories based on their characteristics", [], 'Modules.Featurematching.Admin');
 
-        $this->confirmUninstall = $this->l('Are you sure ?');
+
+        $this->confirmUninstall = $this->trans("Are you sure ?", [], 'Modules.Featurematching.Admin');
 
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
     }
@@ -59,14 +60,38 @@ class Featurematching extends Module
                 'actionCategoryFormBuilderModifier',
                 'actionCategoryUpdate',
                 'actionCategoryAdd',
-            ]);
+            ]) && $this->installTab();
+    }
+
+    private function installTab()
+    {
+        $tab = new Tab();
+        $tab->active = 1;
+        $tab->class_name = 'AdminFeatureMatching';
+        $tab->name = array();
+        foreach (Language::getLanguages(true) as $lang) {
+            $tab->name[$lang['id_lang']] = $this->displayName;
+        }
+        $tab->id_parent = (int) Tab::getIdFromClassName('AdminCatalog');
+        $tab->module = $this->name;
+        return $tab->add();
     }
 
     public function uninstall()
     {
         include(dirname(__FILE__) . '/sql/uninstall.php');
 
-        return parent::uninstall();
+        return parent::uninstall() && $this->uninstallTab();
+    }
+
+    private function uninstallTab()
+    {
+        $id_tab = (int) Tab::getIdFromClassName('AdminFeatureMatching');
+        if ($id_tab) {
+            $tab = new Tab($id_tab);
+            return $tab->delete();
+        }
+        return true;
     }
 
     /**
@@ -74,10 +99,17 @@ class Featurematching extends Module
      */
     public function hookDisplayBackOfficeHeader()
     {
-        if (Tools::getValue('controller') == 'AdminFeatureMatching') {
-            $this->context->controller->addJS($this->_path . 'views/js/back.js');
-            $this->context->controller->addCSS($this->_path . 'views/css/back.css');
-        }
+        $this->context->controller->addJS($this->_path . 'views/js/back.js');
+        $this->context->controller->addCSS($this->_path . 'views/css/back.css');
+
+        $tokenAdminFeatureMatchingAdd = Tools::getAdminTokenLite('AdminFeatureMatchingAdd');
+        
+        // define js value to use in ajax url
+        Media::addJsDef(
+            [
+                'tokenAdminFeatureMatchingAdd' => $tokenAdminFeatureMatchingAdd,
+            ]
+        );
     }
 
     public function hookActionCategoryFormBuilderModifier($params)
@@ -161,6 +193,11 @@ class Featurematching extends Module
     protected function setFeatureCategory($id_category)
     {
         return; /* Db::getInstance()->executeS("SELECT * FROM ps_fm_feature_category WHERE id_category = $id_category"); */
+    }
+
+    public function isUsingNewTranslationSystem()
+    {
+        return true;
     }
 
 }

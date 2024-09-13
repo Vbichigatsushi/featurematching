@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin-dev" source-language="fr-FR" target-language="fr-FR" datatype="plaintext">
+    <body>
+      <trans-unit id="e05c962f022538707cde101c7419873d">
+        <source>Feature group successfully added !</source>
+        <target>Catégorie ajoutée avec succès !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="fcd1c9e3413511cb0cb39a2cdf94b323">
+        <source>Failure adding feature group !</source>
+        <target>Erreur durant l'ajout de la catégorie !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d905f1cb91b426bd204cd3bb01557968">
+        <source>Feature group successfully deleted !</source>
+        <target>Catégorie supprimée avec succès !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="da197716f8e84b415f1d61a465838106">
+        <source>Failure deleting feature group !</source>
+        <target>Erreur durant la suppression de la catégorie !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9410c64962ff601cc09bf8fdf8643e8f">
+        <source>All Feature groups successfully added !</source>
+        <target>Catégories ajoutées avec succès !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a85a529afc64da89654e0e8d947c76d2">
+        <source>Failure adding all feature groups !</source>
+        <target>Erreur durant l'ajout des catégories !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="430cff98e3601149e583f695e3835370">
+        <source>Sub-feature successfully added !</source>
+        <target>Caractéristique ajoutée avec succès !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2644a9689faa22848d69e59a76239c8e">
+        <source>Failure adding sub-feature !</source>
+        <target>Erreur durant l'ajout de la caractéristique !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="773f63a23d7c351957febb561c27a5ce">
+        <source>Sub-feature successfully deleted !</source>
+        <target>Caractéristique supprimée avec succès !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c569c18483722e679fc1d49547f1770f">
+        <source>Failure deleting sub-feature !</source>
+        <target>Erreur durant la suppression de la caractéristique</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ad8f06ce11b658ca36c9200e2a06e7b4">
+        <source>All sub-features added successfully.</source>
+        <target>Caractéristiques ajoutées avec succès !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="279e4db92118179861ceb5525128f069">
+        <source>Failure adding all sub-features !</source>
+        <target>Erreur durant l'ajout des caractéristiques !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e3023fb1f872e4c4794ae15a484fc812">
+        <source>Feature Matching</source>
+        <target>Association de caractéristiques</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="55f55f1541f26b3838819af04f22ae1c">
+        <source>Allows you to associate products with categories based on their characteristics</source>
+        <target>Permet d'associer des produits à des catégories en fonction de leurs caractéristiques</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="01da36bdc7136ee63b0c6ff9689576c6">
+        <source>Are you sure ?</source>
+        <target>Êtes-vous sur ?</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="97effae9810eeb717f27d6b9c539f06a">
+        <source>Feature groups</source>
+        <target>Catégories</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="11284c057f40cdf71bb8cef541ad94ed">
+        <source>Add feature group</source>
+        <target>Ajouter une catégorie</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="eaf9d6e349cab04aaabd642d8651504e">
+        <source>Add all feature groups</source>
+        <target>Ajouter toutes les catégories</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c7e2857bb55792b34e1c70277d7a6eca">
+        <source>Sub-features</source>
+        <target>Caractéristiques</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="81457fbbeaeae092c11d071e6c3c6ce1">
+        <source>Add sub-feature</source>
+        <target>Ajouter une caractéristique</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="46af92c99106895ee3a4e98324352e64">
+        <source>Add all sub-features</source>
+        <target>Ajouter toutes les caractéristiques</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
