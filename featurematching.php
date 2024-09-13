@@ -411,7 +411,7 @@ class Featurematching extends Module
 
     public function removeMatchCategoryAndProduct($categoryId, $productId): bool
     {
-        return Db::getInstance()->delete();
+        return Db::getInstance()->delete('category_product', "id_category = $categoryId AND id_product = $productId");
     }
 
     public function isUsingNewTranslationSystem()
