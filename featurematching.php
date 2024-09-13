@@ -191,7 +191,9 @@ class Featurematching extends Module
         );
     }
 
-
+    /* 
+    EXECUTED ON category PAGE SAVING
+    */
     protected function processCategoryFormData($params)
     {
         $categoryId = (int) $params['category']->id;
@@ -223,16 +225,6 @@ class Featurematching extends Module
                 }
             }
 
-            $featuresToRemove = array_diff($oldFeatures, $newFeatures);
-
-            foreach ($featuresToRemove as $featureId) {
-                $this->removeFeatureCategory($categoryId, $featureId);
-                $productsToRemove = $this->getAllProductByFeature($featureId);
-                foreach ($productsToRemove as $productId) {
-                    $this->removeMatchCategoryAndProduct($categoryId, $productId);
-                }
-            }
-
             $categoryFeatures = $this->getCategoryFeatures($categoryId);
 
             foreach ($categoryFeatures as $featureId) {
@@ -240,11 +232,30 @@ class Featurematching extends Module
 
                 foreach ($productsToMatch as $productId) {
                     $this->matchCategoryAndProduct($categoryId, $productId);
+                    PrestaShopLogger::addLog("ASSOC CAT : $categoryId, $productId");
+                }
+            }
+
+
+            $featuresToRemove = array_diff($oldFeatures, $newFeatures);
+
+            foreach ($featuresToRemove as $featureId) {
+                $this->removeFeatureCategory($categoryId, $featureId);
+                $productsToRemove = $this->getAllProductByFeature($featureId);
+
+                foreach ($productsToRemove as $productId) {
+                    if (!$this->removeMatchCategoryAndProduct($categoryId, $productId)) {
+
+                        PrestaShopLogger::addLog("failed to delete assoc : $categoryId, $productId");
+                    }
                 }
             }
         }
     }
 
+    /* 
+    EXECUTED ON PRODUCT PAGE SAVING
+    */
     protected function processProductFormData($params)
     {
         $productId = (int) $params['product']->id;
@@ -279,26 +290,30 @@ class Featurematching extends Module
                 }
             }
 
-            $featuresToRemove = array_diff($oldFeatures, $newFeatures);
-
-            foreach ($featuresToRemove as $featureId) {
-                $this->removeFeatureProduct($productId, $featureId);
-                $categoriesToRemove = $this->getAllCategoryByFeature($featureId);
-                foreach ($categoriesToRemove as $categoryId) {
-                    $this->removeMatchCategoryAndProduct($categoryId, $productId);
-                }
-            }
-
             $productFeatures = $this->getProductFeatures($productId);
 
             foreach ($productFeatures as $featureId) {
                 $categoriesToMatch = $this->getAllCategoryByFeature($featureId);
 
                 foreach ($categoriesToMatch as $categoryId) {
+                    PrestaShopLogger::addLog("ASSOC CAT : $categoryId, $productId");
                     $this->matchCategoryAndProduct($categoryId, $productId);
                 }
             }
 
+            $featuresToRemove = array_diff($oldFeatures, $newFeatures);
+
+            foreach ($featuresToRemove as $featureId) {
+                $this->removeFeatureProduct($productId, $featureId);
+                $categoriesToRemove = $this->getAllCategoryByFeature($featureId);
+
+                foreach ($categoriesToRemove as $categoryId) {
+                    if (!$this->removeMatchCategoryAndProduct((int) $categoryId, (int) $productId)) {
+
+                        PrestaShopLogger::addLog("failed to delete assoc : $categoryId, $productId");
+                    }
+                }
+            }
         }
     }
 
@@ -325,7 +340,19 @@ class Featurematching extends Module
     // TODO : list all categories of last level with same feature 
     public function hookDisplayProductAdditionalInfo($params)
     {
+        $productId = $params['product']->id;
         return "<p>catégories compatibles ...</p>";
+        /* 
+        "recupere" à priori les categories de dernier niveau pour un produit donné
+
+        SELECT c.id_category
+        FROM ps_category c
+        INNER JOIN ps_category_product cp ON c.id_category = cp.id_category
+        LEFT JOIN ps_category c2 ON c.id_category = c2.id_parent
+        WHERE cp.id_product = $productId
+        AND c2.id_category IS NULL;
+        
+        */
     }
 
     protected function saveFeatureCategory($categoryId, $featureId): bool
@@ -373,14 +400,14 @@ class Featurematching extends Module
     {
 
         return array_map(function ($feature): int {
-            return (int) $feature['id_category']; // return int id_feature
+            return (int) $feature['id_category']; // return int id_category
         }, Db::getInstance()->executeS("SELECT id_category FROM " . _DB_PREFIX_ . "fm_feature_category WHERE id_feature = $featureId"));
     }
 
     protected function getAllProductByFeature(int $featureId): array
     {
         return array_map(function ($feature): int {
-            return (int) $feature['id_product']; // return int id_feature
+            return (int) $feature['id_product']; // return int id_product
         }, Db::getInstance()->executeS("SELECT id_product FROM " . _DB_PREFIX_ . "fm_feature_product WHERE id_feature = $featureId"));
     }
 
