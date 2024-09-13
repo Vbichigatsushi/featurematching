@@ -126,43 +126,46 @@ class Featurematching extends Module
         // get existing form
         $formBuilder = $params['form_builder'];
         $categoryId = $params['id'];
-        // Retrieve the previously saved selections for this category
-        $savedFeatures = $this->getCategoryFeatures($categoryId);
 
-        $featureGroups = $this->getAllFeatureGroup();
-        foreach ($featureGroups as $group) {
-            $features = $this->getFeatureByGroup($group['id_feature_group']);
-            $choices = [];
-            $selected = [];
+        if (isset($categoryId)) {
+            // Retrieve the previously saved selections for this category
+            $savedFeatures = $this->getCategoryFeatures($categoryId);
 
-            foreach ($features as $feature) {
-                // Correctly adding each feature to the choices array
-                $choices[ucfirst($feature['name'])] = (int) $feature['id_feature'];
-                // Check if this feature was selected before
-                if (in_array((int) $feature['id_feature'], $savedFeatures)) {
-                    $selected[] = (int) $feature['id_feature'];
+            $featureGroups = $this->getAllFeatureGroup();
+            foreach ($featureGroups as $group) {
+                $features = $this->getFeatureByGroup($group['id_feature_group']);
+                $choices = [];
+                $selected = [];
+
+                foreach ($features as $feature) {
+                    // Correctly adding each feature to the choices array
+                    $choices[ucfirst($feature['name'])] = (int) $feature['id_feature'];
+                    // Check if this feature was selected before
+                    if (in_array((int) $feature['id_feature'], $savedFeatures)) {
+                        $selected[] = (int) $feature['id_feature'];
+                    }
                 }
-            }
 
-            // Add a new custom field with the correct choices
-            $formBuilder->add(
-                $group['name'],
-                ChoiceType::class,
-                [
-                    'choices' => $choices,
-                    'label' => ucfirst($group['name']), // Use HTML for the label
-                    'multiple' => true,  // Allow multiple selections
-                    'expanded' => true,  // Use checkboxes
-                    'data' => $selected, // Set default values
-                    'attr' => [
-                        'class' => 'form-control d-flex',
-                        'style' => 'gap: 20px',
-                    ],
-                    'row_attr' => [
-                        'class' => 'form-group text-widget ' // Classe pour le conteneur parent
-                    ],
-                ]
-            );
+                // Add a new custom field with the correct choices
+                $formBuilder->add(
+                    $group['name'],
+                    ChoiceType::class,
+                    [
+                        'choices' => $choices,
+                        'label' => ucfirst($group['name']), // Use HTML for the label
+                        'multiple' => true,  // Allow multiple selections
+                        'expanded' => true,  // Use checkboxes
+                        'data' => $selected, // Set default values
+                        'attr' => [
+                            'class' => 'form-control d-flex',
+                            'style' => 'gap: 20px',
+                        ],
+                        'row_attr' => [
+                            'class' => 'form-group text-widget ' // Classe pour le conteneur parent
+                        ],
+                    ]
+                );
+            }
         }
     }
 
