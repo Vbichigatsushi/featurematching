@@ -354,7 +354,7 @@ class Featurematching extends Module
         return Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'fm_feature_product WHERE id_product = ' . (int) $productId . ' AND id_feature = ' . (int) $featureId);
     }
 
-    protected function getCategoryFeatures($categoryId): array
+    protected function getCategoryFeatures(int $categoryId): array
     {
 
         return array_map(function ($feature): int {
@@ -362,7 +362,7 @@ class Featurematching extends Module
         }, Db::getInstance()->executeS("SELECT id_feature FROM " . _DB_PREFIX_ . "fm_feature_category WHERE id_category = $categoryId"));
     }
 
-    protected function getProductFeatures($productId): array
+    protected function getProductFeatures(int $productId): array
     {
         return array_map(function ($feature): int {
             return (int) $feature['id_feature']; // return int id_feature
@@ -377,7 +377,7 @@ class Featurematching extends Module
         }, Db::getInstance()->executeS("SELECT id_category FROM " . _DB_PREFIX_ . "fm_feature_category WHERE id_feature = $featureId"));
     }
 
-    protected function getAllProductByFeature($featureId): array
+    protected function getAllProductByFeature(int $featureId): array
     {
         return array_map(function ($feature): int {
             return (int) $feature['id_product']; // return int id_feature
@@ -389,18 +389,18 @@ class Featurematching extends Module
         return Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "fm_feature_group ORDER BY name ASC");
     }
 
-    public function getFeatureByGroup($featureGroupId): array
+    public function getFeatureByGroup(int $featureGroupId): array
     {
         return Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "fm_feature WHERE id_feature_group = $featureGroupId");
     }
 
-    public function getNewPositionInCategory($categoryId): int
+    public function getNewPositionInCategory(int $categoryId): int
     {
         $newPosition = Db::getInstance()->getValue("SELECT MAX(position) + 1 FROM " . _DB_PREFIX_ . "category_product WHERE id_category = $categoryId");
         return $newPosition ? (int) $newPosition : 0;
     }
 
-    public function matchCategoryAndProduct($categoryId, $productId): bool
+    public function matchCategoryAndProduct(int $categoryId, int $productId): bool
     {
         return Db::getInstance()->insert('category_product', [
             'id_category' => (int) $categoryId,
@@ -409,9 +409,9 @@ class Featurematching extends Module
         ], false, true, Db::INSERT_IGNORE);
     }
 
-    public function removeMatchCategoryAndProduct($categoryId, $productId): bool
+    public function removeMatchCategoryAndProduct(int $categoryId, int $productId): bool
     {
-        return Db::getInstance()->delete('category_product', "id_category = $categoryId AND id_product = $productId");
+        return Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'category_product WHERE id_category = ' . (int) $categoryId . ' AND id_product = ' . (int) $productId);
     }
 
     public function isUsingNewTranslationSystem()
