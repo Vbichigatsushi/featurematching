@@ -66,7 +66,9 @@ class Featurematching extends Module
                 'actionCategoryFormBuilderModifier',
                 'actionCategoryUpdate',
                 'actionCategoryAdd',
-<<<<<<< HEAD
+                'actionProductFormBuilderModifier',
+                'actionProductUpdate',
+                'actionProductAdd',
             ]) && $this->installTab();
     }
 
@@ -82,12 +84,6 @@ class Featurematching extends Module
         $tab->id_parent = (int) Tab::getIdFromClassName('AdminCatalog');
         $tab->module = $this->name;
         return $tab->add();
-=======
-                'actionProductFormBuilderModifier',
-                'actionProductUpdate',
-                'actionProductAdd',
-            ]);
->>>>>>> feature-category-form
     }
 
     public function uninstall()
@@ -384,23 +380,7 @@ class Featurematching extends Module
 
     public function getNewPositionInCategory($categoryId): int
     {
-        return (int) Db::getInstance()->getValue("SELECT MAX(position) + 1 FROM " . _DB_PREFIX_ . "category_product WHERE id_category = $categoryId");
+        return; /* Db::getInstance()->executeS("SELECT * FROM ps_fm_feature_category WHERE id_category = $id_category"); */
     }
 
-<<<<<<< HEAD
-    public function isUsingNewTranslationSystem()
-    {
-        return true;
-    }
-
-=======
-    public function matchCategoryAndProduct($categoryId, $productId): bool
-    {
-        return Db::getInstance()->insert('category_product', [
-            'id_category' => (int) $categoryId,
-            'id_product' => (int) $productId,
-            'position' => (int) $this->getNewPositionInCategory($categoryId),
-        ], false, true, Db::INSERT_IGNORE);
-    }
->>>>>>> feature-category-form
 }
