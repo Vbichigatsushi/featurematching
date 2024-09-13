@@ -332,7 +332,7 @@ function addAllSubFeatures(form) {
                     $.each(subFeatures, function(index, subFeature) {
                         const newli = `<li style="height: 25px;display: flex;align-items: center;flex-direction: row;gap: 10px;">
                             <strong>${capitalizeFirstLetter(subFeature)}</strong>
-                            <button class="btnDeleteFeature" type="button" style="display:flex;align-items: center;justify-content: left;gap: 10px;height: 25px;background: none;border: none;">
+                            <button class="btnDeleteFeature" type="button" onclick="DeleteSubFeature(this.previousElementSibling)" style="display:flex;align-items: center;justify-content: left;gap: 10px;height: 25px;background: none;border: none;">
                                 <span class="material-icons text-danger">delete</span>
                             </button>
                         </li>`;
