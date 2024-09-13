@@ -69,6 +69,7 @@ class Featurematching extends Module
                 'actionProductFormBuilderModifier',
                 'actionProductUpdate',
                 'actionProductAdd',
+                'displayProductAdditionalInfo',
             ]) && $this->installTab();
     }
 
@@ -148,7 +149,7 @@ class Featurematching extends Module
 
                 // Add a new custom field with the correct choices
                 $formBuilder->add(
-                    $group['name'],
+                    str_replace(' ', '-', $group['name']),
                     ChoiceType::class,
                     [
                         'choices' => $choices,
@@ -209,7 +210,7 @@ class Featurematching extends Module
         if (isset($customFields['category']) && is_array($customFields['category'])) {
             foreach ($customFields['category'] as $subgroupKey => $subgroupValue) {
                 // Check if subgroupKey is a valid feature group
-                if (in_array($subgroupKey, $featureGroupKeys)) {
+                if (in_array(str_replace('-', ' ', $subgroupKey), $featureGroupKeys)) {
                     if (isset($customFields['category'][$subgroupKey])) {
                         // For each selected feature, save it
                         foreach ($customFields['category'][$subgroupKey] as $featureId) {
@@ -226,6 +227,10 @@ class Featurematching extends Module
 
             foreach ($featuresToRemove as $featureId) {
                 $this->removeFeatureCategory($categoryId, $featureId);
+                $productsToRemove = $this->getAllProductByFeature($featureId);
+                foreach ($productsToRemove as $productId) {
+                    $this->removeMatchCategoryAndProduct($categoryId, $productId);
+                }
             }
 
             $categoryFeatures = $this->getCategoryFeatures($categoryId);
@@ -260,7 +265,7 @@ class Featurematching extends Module
             foreach ($customFields['product']['details'] as $subgroupKey => $subgroupValue) {
 
                 // Check if subgroupKey is a valid feature group
-                if (in_array($subgroupKey, $featureGroupKeys)) {
+                if (in_array(str_replace('-', ' ', $subgroupKey), $featureGroupKeys)) {
                     if (isset($customFields['product']['details'][$subgroupKey])) {
 
                         // For each selected feature, save it
@@ -278,6 +283,10 @@ class Featurematching extends Module
 
             foreach ($featuresToRemove as $featureId) {
                 $this->removeFeatureProduct($productId, $featureId);
+                $categoriesToRemove = $this->getAllCategoryByFeature($featureId);
+                foreach ($categoriesToRemove as $categoryId) {
+                    $this->removeMatchCategoryAndProduct($categoryId, $productId);
+                }
             }
 
             $productFeatures = $this->getProductFeatures($productId);
@@ -311,6 +320,12 @@ class Featurematching extends Module
     public function hookActionProductUpdate($params)
     {
         $this->processProductFormData($params);
+    }
+
+    // TODO : list all categories of last level with same feature 
+    public function hookDisplayProductAdditionalInfo($params)
+    {
+        return "<p>catégories compatibles ...</p>";
     }
 
     protected function saveFeatureCategory($categoryId, $featureId): bool
@@ -392,6 +407,11 @@ class Featurematching extends Module
             'id_product' => (int) $productId,
             'position' => (int) $this->getNewPositionInCategory($categoryId),
         ], false, true, Db::INSERT_IGNORE);
+    }
+
+    public function removeMatchCategoryAndProduct($categoryId, $productId): bool
+    {
+        return Db::getInstance()->delete();
     }
 
     public function isUsingNewTranslationSystem()

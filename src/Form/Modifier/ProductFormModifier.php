@@ -60,7 +60,7 @@ final class ProductFormModifier
             $this->formBuilderModifier->addAfter(
                 $detailsTabFormBuilder, // the tab
                 'customizations', // the input/form from which to insert after/before
-                $group['name'], // your field name
+                str_replace(' ', '-', $group['name']), // your field name
                 ChoiceType::class, // your field type
                 [
                     'choices' => $choices,
