@@ -1,0 +1,6 @@
+services:
+  Pimentbleu\Featurematching\Form\Modifier\ProductFormModifier:
+    autowire: true
+    public: true
+    arguments:
+      $formBuilderModifier: "@form.form_builder_modifier"
