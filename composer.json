@@ -11,5 +11,7 @@
             "prepend-autoloader": false
         },
         "type": "prestashop-module"
+    },
+    "config": {
     }
 }

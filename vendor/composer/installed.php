@@ -3,7 +3,7 @@
         'name' => 'pimentbleu/featurematching',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => '5532e8f229b64997daaf89f7a6cb83fc2ab3fc66',
+        'reference' => '3aa59793237d598f31d815212b5efd837eb609bd',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'pimentbleu/featurematching' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => '5532e8f229b64997daaf89f7a6cb83fc2ab3fc66',
+            'reference' => '3aa59793237d598f31d815212b5efd837eb609bd',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

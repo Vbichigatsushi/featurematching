@@ -22,7 +22,7 @@ class AdminFeatureMatchingController extends ModuleAdminController
 
         $formattedFeatures = array();
         foreach ($features as $feature) {
-        	$formattedFeatures[] = [ucfirst($feature['name'] ), array_map('ucfirst', explode(";", $feature['features']))];
+            $formattedFeatures[] = [ucfirst($feature['name']), array_map('ucfirst', explode(";", $feature['features']))];
 
         }
 

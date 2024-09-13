@@ -187,7 +187,6 @@ class Featurematching extends Module
             $params['form_builder'],
             $featureGroups,
             $savedFeatures,
-
         );
     }
 
@@ -380,10 +379,10 @@ class Featurematching extends Module
         return Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "fm_feature WHERE id_feature_group = $featureGroupId");
     }
 
-
     public function getNewPositionInCategory($categoryId): int
     {
-        return (int) Db::getInstance()->getValue("SELECT MAX(position) + 1 FROM " . _DB_PREFIX_ . "category_product WHERE id_category = $categoryId");
+        $newPosition = Db::getInstance()->getValue("SELECT MAX(position) + 1 FROM " . _DB_PREFIX_ . "category_product WHERE id_category = $categoryId");
+        return $newPosition ? (int) $newPosition : 0;
     }
 
     public function matchCategoryAndProduct($categoryId, $productId): bool
