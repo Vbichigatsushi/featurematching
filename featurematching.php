@@ -112,7 +112,7 @@ class Featurematching extends Module
         $this->context->controller->addCSS($this->_path . 'views/css/back.css');
 
         $tokenAdminFeatureMatchingAdd = Tools::getAdminTokenLite('AdminFeatureMatchingAdd');
-        
+
         // define js value to use in ajax url
         Media::addJsDef(
             [
@@ -380,7 +380,20 @@ class Featurematching extends Module
 
     public function getNewPositionInCategory($categoryId): int
     {
-        return; /* Db::getInstance()->executeS("SELECT * FROM ps_fm_feature_category WHERE id_category = $id_category"); */
+        return (int) Db::getInstance()->getValue("SELECT MAX(position) + 1 FROM " . _DB_PREFIX_ . "category_product WHERE id_category = $categoryId");
     }
 
+    public function matchCategoryAndProduct($categoryId, $productId): bool
+    {
+        return Db::getInstance()->insert('category_product', [
+            'id_category' => (int) $categoryId,
+            'id_product' => (int) $productId,
+            'position' => (int) $this->getNewPositionInCategory($categoryId),
+        ], false, true, Db::INSERT_IGNORE);
+    }
+
+    public function isUsingNewTranslationSystem()
+    {
+        return true;
+    }
 }
