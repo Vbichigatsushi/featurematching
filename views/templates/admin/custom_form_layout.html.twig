@@ -1,0 +1,11 @@
+{% block custom_form_layout %}
+    <div class="custom-form-group">
+        <div class="form-group-header">
+            {{ form_label(form) | raw }} {# Render the label as HTML #}
+        </div>
+        <div class="form-group-body">
+            {{ form_widget(form) }} {# Render the field (checkboxes in this case) #}
+        </div>
+        {{ form_errors(form) }} {# Display any validation errors #}
+    </div>
+{% endblock %}

@@ -1,0 +1,24 @@
+name: build
+on:
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    build:
+        name: build dependencies & create artifact
+        runs-on: ubuntu-latest
+        steps:
+            - name: 🚚 Get latest code
+              uses: actions/checkout@v4
+
+            # Remove development files
+            - name: 🧹 Clean-up project
+              uses: PrestaShopCorp/github-action-clean-before-deploy@v2.0
+
+            # Zip files and upload to artifacts list
+            - name: 🏗️ Create & upload artifact
+              uses: actions/upload-artifact@v4.3.3
+              with:
+                  name: ${{ github.event.repository.name }}
+                  path: ${{ github.workspace }}
