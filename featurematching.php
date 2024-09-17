@@ -385,9 +385,7 @@ class Featurematching extends Module
             }
 
             $categoryNames = explode(', ', $item['category_names']);
-            foreach ($categoryNames as $index => $categoryName) {
-                $item['category_names'][$index] = $categoryName;
-            }
+            $item['category_names'] = $categoryNames;
 
             // Ajouter l'élément dans le groupe correspondant
             $groupedArray[$grandparentName][] = $item;
