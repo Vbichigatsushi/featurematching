@@ -8,7 +8,11 @@
 		    	{foreach from=$categorie item=categoryDetails}
 		            <tr>
 		                <td>{$categoryDetails['parent_name']}</td>
-		                <td>{$categoryDetails['category_names']}</td>
+		                <td>
+		                	{foreach from=$categoryDetails['category_names'] item=categoryName}
+		                		<p>{$categoryName}</p>
+		                	{/foreach}
+		                </td>
 		                <td>
 		                	{foreach from=$categoryDetails['category_links'] item=categoryLink}
 		                		<p>{$categoryLink}</p>
