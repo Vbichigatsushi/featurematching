@@ -1,13 +1,5 @@
-<div>
-	<p>catégories compatibles ...</p>
-	{* Récupérer la liste des grands-parents uniques *}
-	{assign var="grandparents" value=[]}
-	{foreach $categories as $category}
-	    {if not in_array($category.grandparent_name, $grandparents)}
-	        {assign var="grandparents" value=$grandparents|array_merge:[$category.grandparent_name]}
-	    {/if}
-	{/foreach}
-
+<section>
+	<p class="h6">catégories compatibles ...</p>
 	<table border="1">
 	    <thead>
 	        <tr>
@@ -36,4 +28,4 @@
 	    </tbody>
 	</table>
 
-</div>
+</section>

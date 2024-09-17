@@ -345,7 +345,7 @@ class Featurematching extends Module
     {
         $productId = $params['product']->id;
 
-        $affiliatedProducts = Db::getInstance()->executeS("SELECT DISTINCT
+        $affiliatedCategories = Db::getInstance()->executeS("SELECT DISTINCT
           c.id_parent,
           GROUP_CONCAT(DISTINCT c.id_category ORDER BY c.id_category SEPARATOR ';') AS category_ids,
           GROUP_CONCAT(DISTINCT c_lang.name ORDER BY c_lang.name SEPARATOR ';') AS category_names,
@@ -366,9 +366,24 @@ class Featurematching extends Module
           AND (c.id_parent NOT IN (1, 2) OR c.id_parent IS NULL) -- Exclure les catégories avec id_parent = 1 ou 2
         GROUP BY c.id_parent;");
 
-        $this->context->smarty->assign('categories', $affiliatedProducts);
+        $groupedArray = [];
 
-        return $this->display(__FILE__, 'views/templates/front/moreProductDetails.tpl');
+        // Parcourir le tableau d'origine
+        foreach ($affiliatedCategories as $item) {
+            $grandparentName = $item['grandparent_name'];
+            
+            // Si le nom du grandparent n'existe pas encore dans le tableau regroupé, on l'initialise
+            if (!isset($groupedArray[$grandparentName])) {
+                $groupedArray[$grandparentName] = [];
+            }
+            
+            // Ajouter l'élément dans le groupe correspondant
+            $groupedArray[$grandparentName][] = $item;
+        }
+
+        $this->context->smarty->assign('affiliatedCategories', $groupedArray);
+        return "<p>test...</p>".$groupedArray;
+        //return $this->display(__FILE__, 'views/templates/front/moreProductDetails.tpl');
     }
 
     protected function saveFeatureCategory($categoryId, $featureId): bool
