@@ -1,9 +1,9 @@
 <section>
-	<p class="h6">catégories compatibles ...</p>
+	<p class="h6">Compatibilitées</p>
 	{foreach from=$affiliatedCategories key=categoryName item=categorie}
-	    <p class="h7">{$categoryName}</p>
+	    <p class="h6">{$categoryName}</p>
 	            
-		<table border="1">
+		<table class="table table-striped table-bordered table-sm">
 		    <tbody>
 		    	{foreach from=$categorie item=categoryDetails}
 		            <tr>
