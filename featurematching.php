@@ -347,8 +347,8 @@ class Featurematching extends Module
 
         $affiliatedCategories = Db::getInstance()->executeS("SELECT DISTINCT
           c.id_parent,
-          GROUP_CONCAT(DISTINCT c.id_category ORDER BY c.id_category SEPARATOR ' ,') AS category_ids,
-          GROUP_CONCAT(DISTINCT c_lang.name ORDER BY c_lang.name SEPARATOR ' ,') AS category_names,
+          GROUP_CONCAT(DISTINCT c.id_category ORDER BY c.id_category SEPARATOR ', ') AS category_ids,
+          GROUP_CONCAT(DISTINCT c_lang.name ORDER BY c_lang.name SEPARATOR ', ') AS category_names,
           MAX(parent_lang.name) AS parent_name,  -- Le nom du parent
           MAX(grandparent_lang.name) AS grandparent_name  -- Le nom du parent du parent (grandparent)
         FROM " . _DB_PREFIX_ . "product p
@@ -371,19 +371,41 @@ class Featurematching extends Module
         // Parcourir le tableau d'origine
         foreach ($affiliatedCategories as $item) {
             $grandparentName = $item['grandparent_name'];
-            
+
             // Si le nom du grandparent n'existe pas encore dans le tableau regroupé, on l'initialise
             if (!isset($groupedArray[$grandparentName])) {
                 $groupedArray[$grandparentName] = [];
             }
-            
+
+            // Générer les liens pour chaque catégorie
+            $categoryIds = explode(', ', $item['category_ids']);
+            $categoryLinks = [];
+            foreach ($categoryIds as $categoryId) {
+                $categoryLinks[] = $this->generateCategoryLink($categoryId);
+            }
+
+            // Concaténer les liens avec un séparateur
+            $item['category_links'] = implode(' | ', $categoryLinks);
+
             // Ajouter l'élément dans le groupe correspondant
             $groupedArray[$grandparentName][] = $item;
         }
 
         $this->context->smarty->assign('affiliatedCategories', $groupedArray);
-        //return "<p>test...</p>".json_encode($groupedArray);
+
         return $this->display(__FILE__, 'views/templates/front/moreProductDetails.tpl');
+    }
+
+
+    public function generateCategoryLink($categoryId)
+    {
+        // get your category instance (from ObjectModel in this example)
+        $category = new Category($categoryId);
+
+        // get your category URL
+        $link = $context->link->getCategoryLink($category);
+
+        return $link;
     }
 
     protected function saveFeatureCategory($categoryId, $featureId): bool
