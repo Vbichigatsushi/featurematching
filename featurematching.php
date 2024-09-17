@@ -347,8 +347,8 @@ class Featurematching extends Module
 
         $affiliatedCategories = Db::getInstance()->executeS("SELECT DISTINCT
           c.id_parent,
-          GROUP_CONCAT(DISTINCT c.id_category ORDER BY c.id_category SEPARATOR ';') AS category_ids,
-          GROUP_CONCAT(DISTINCT c_lang.name ORDER BY c_lang.name SEPARATOR ';') AS category_names,
+          GROUP_CONCAT(DISTINCT c.id_category ORDER BY c.id_category SEPARATOR ' ,') AS category_ids,
+          GROUP_CONCAT(DISTINCT c_lang.name ORDER BY c_lang.name SEPARATOR ' ,') AS category_names,
           MAX(parent_lang.name) AS parent_name,  -- Le nom du parent
           MAX(grandparent_lang.name) AS grandparent_name  -- Le nom du parent du parent (grandparent)
         FROM " . _DB_PREFIX_ . "product p
@@ -382,8 +382,8 @@ class Featurematching extends Module
         }
 
         $this->context->smarty->assign('affiliatedCategories', $groupedArray);
-        return "<p>test...</p>".json_encode($groupedArray);
-        //return $this->display(__FILE__, 'views/templates/front/moreProductDetails.tpl');
+        //return "<p>test...</p>".json_encode($groupedArray);
+        return $this->display(__FILE__, 'views/templates/front/moreProductDetails.tpl');
     }
 
     protected function saveFeatureCategory($categoryId, $featureId): bool
