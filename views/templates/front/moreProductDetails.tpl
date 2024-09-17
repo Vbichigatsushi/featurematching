@@ -9,7 +9,11 @@
 		            <tr>
 		                <td>{$categoryDetails['parent_name']}</td>
 		                <td>{$categoryDetails['category_names']}</td>
-		                <td>{$categoryDetails['category_links']}</td>
+		                <td>
+		                	{foreach from=$categoryDetails['category_links'] item=categoryLink}
+		                		<p>{$categoryLink}</p>
+		                	{/foreach}
+		                </td>
 		            </tr>
 	            {/foreach}
 		    </tbody>
