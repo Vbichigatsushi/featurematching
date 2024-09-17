@@ -382,7 +382,7 @@ class Featurematching extends Module
         }
 
         $this->context->smarty->assign('affiliatedCategories', $groupedArray);
-        return "<p>test...</p>".$groupedArray;
+        return "<p>test...</p>".json_encode($groupedArray);
         //return $this->display(__FILE__, 'views/templates/front/moreProductDetails.tpl');
     }
 
