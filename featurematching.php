@@ -366,7 +366,7 @@ class Featurematching extends Module
           AND (c.id_parent NOT IN (1, 2) OR c.id_parent IS NULL) -- Exclure les catégories avec id_parent = 1 ou 2
         GROUP BY c.id_parent;");
 
-        $this->context->smarty->assign('sqlReturn', json_encode($affiliatedProducts));
+        $this->context->smarty->assign('categories', $affiliatedProducts);
 
         return $this->display(__FILE__, 'views/templates/front/moreProductDetails.tpl');
     }
