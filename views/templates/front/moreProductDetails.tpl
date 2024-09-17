@@ -9,7 +9,7 @@
 		            <tr>
 		                <td>{$categoryDetails['parent_name']}</td>
 		                <td>
-		                	{foreach from=$categoryDetails['category_names_array'] item=categoryName}
+		                	{foreach from=$categoryDetails['category_names'] item=categoryName}
 		                		<p>{$categoryName}</p>
 		                	{/foreach}
 		                </td>
