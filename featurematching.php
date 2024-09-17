@@ -381,11 +381,8 @@ class Featurematching extends Module
             $categoryIds = explode(', ', $item['category_ids']);
             $categoryLinks = [];
             foreach ($categoryIds as $categoryId) {
-                $categoryLinks[] = $this->generateCategoryLink($categoryId);
+                $item['category_links'][] = $this->generateCategoryLink($categoryId);
             }
-
-            // Concaténer les liens avec un séparateur
-            $item['category_links'] = implode(' | ', $categoryLinks);
 
             // Ajouter l'élément dans le groupe correspondant
             $groupedArray[$grandparentName][] = $item;
