@@ -69,7 +69,7 @@ class Featurematching extends Module
                 'actionProductFormBuilderModifier',
                 'actionProductUpdate',
                 'actionProductAdd',
-                'displayProductAdditionalInfo',
+                'displayMoreProductDetails',
             ]) && $this->installTab();
     }
 
@@ -236,13 +236,13 @@ class Featurematching extends Module
                 }
             }
 
-
+            PrestaShopLogger::addLog("features to remove before");
             $featuresToRemove = array_diff($oldFeatures, $newFeatures);
-
+            PrestaShopLogger::addLog("feature id : ".json_encode($featuresToRemove));
             foreach ($featuresToRemove as $featureId) {
                 $this->removeFeatureCategory($categoryId, $featureId);
                 $productsToRemove = $this->getAllProductByFeature($featureId);
-
+                PrestaShopLogger::addLog("feature id : $featureId");
                 foreach ($productsToRemove as $productId) {
                     if (!$this->removeMatchCategoryAndProduct($categoryId, $productId)) {
 
@@ -283,6 +283,7 @@ class Featurematching extends Module
                         foreach ($customFields['product']['details'][$subgroupKey] as $featureId) {
                             $newFeatures[] = $featureId;
                             if (!in_array($featureId, $oldFeatures)) {
+                                PrestaShopLogger::addLog("save product ");
                                 $this->saveFeatureProduct($productId, $featureId);
                             }
                         }
@@ -300,18 +301,20 @@ class Featurematching extends Module
                     $this->matchCategoryAndProduct($categoryId, $productId);
                 }
             }
+        }
+        $featuresToRemove = array_diff($oldFeatures, $newFeatures);
+        PrestaShopLogger::addLog("feature id : ".json_encode($featuresToRemove));
 
-            $featuresToRemove = array_diff($oldFeatures, $newFeatures);
+        foreach ($featuresToRemove as $featureId) {
+            $this->removeFeatureProduct($productId, $featureId);
+            $categoriesToRemove = $this->getAllCategoryByFeature($featureId);
+            PrestaShopLogger::addLog("catgoriestoremove : ".json_encode($categoriesToRemove));
 
-            foreach ($featuresToRemove as $featureId) {
-                $this->removeFeatureProduct($productId, $featureId);
-                $categoriesToRemove = $this->getAllCategoryByFeature($featureId);
+            foreach ($categoriesToRemove as $categoryId) {
+                PrestaShopLogger::addLog("catid : ".$categoryId." , productid : ".$productId);
+                if (!$this->removeMatchCategoryAndProduct((int) $categoryId, (int) $productId)) {
 
-                foreach ($categoriesToRemove as $categoryId) {
-                    if (!$this->removeMatchCategoryAndProduct((int) $categoryId, (int) $productId)) {
-
-                        PrestaShopLogger::addLog("failed to delete assoc : $categoryId, $productId");
-                    }
+                    PrestaShopLogger::addLog("failed to delete assoc : $categoryId, $productId");
                 }
             }
         }
@@ -338,21 +341,32 @@ class Featurematching extends Module
     }
 
     // TODO : list all categories of last level with same feature 
-    public function hookDisplayProductAdditionalInfo($params)
+    public function hookDisplayMoreProductDetails($params)
     {
         $productId = $params['product']->id;
-        return "<p>catégories compatibles ...</p>";
-        /* 
-        "recupere" à priori les categories de dernier niveau pour un produit donné
 
-        SELECT c.id_category
-        FROM ps_category c
-        INNER JOIN ps_category_product cp ON c.id_category = cp.id_category
-        LEFT JOIN ps_category c2 ON c.id_category = c2.id_parent
-        WHERE cp.id_product = $productId
-        AND c2.id_category IS NULL;
-        
-        */
+        $affiliatedProducts = Db::getInstance()->executeS("SELECT DISTINCT
+          c.id_parent,
+          GROUP_CONCAT(DISTINCT c.id_category ORDER BY c.id_category SEPARATOR ';') AS category_ids,
+          GROUP_CONCAT(DISTINCT c_lang.name ORDER BY c_lang.name SEPARATOR ';') AS category_names,
+          MAX(parent_lang.name) AS parent_name,  -- Le nom du parent
+          MAX(grandparent_lang.name) AS grandparent_name  -- Le nom du parent du parent (grandparent)
+        FROM " . _DB_PREFIX_ . "product p
+        JOIN " . _DB_PREFIX_ . "category_product cp ON p.id_product = cp.id_product
+        JOIN " . _DB_PREFIX_ . "category c ON cp.id_category = c.id_category
+        JOIN " . _DB_PREFIX_ . "category_lang c_lang ON c.id_category = c_lang.id_category
+        LEFT JOIN " . _DB_PREFIX_ . "category c_parent ON c.id_parent = c_parent.id_category
+        LEFT JOIN " . _DB_PREFIX_ . "category_lang parent_lang ON c_parent.id_category = parent_lang.id_category
+        LEFT JOIN " . _DB_PREFIX_ . "category c_grandparent ON c_parent.id_parent = c_grandparent.id_category  -- Join pour le parent du parent
+        LEFT JOIN " . _DB_PREFIX_ . "category_lang grandparent_lang ON c_grandparent.id_category = grandparent_lang.id_category  -- Langue du grandparent
+        WHERE p.id_product = 547
+          AND c_lang.id_lang = 1  -- Langue à utiliser pour les catégories
+          AND (parent_lang.id_lang = 1 OR parent_lang.id_lang IS NULL) -- Langue pour le parent
+          AND (grandparent_lang.id_lang = 1 OR grandparent_lang.id_lang IS NULL) -- Langue pour le grandparent
+          AND (c.id_parent NOT IN (1, 2) OR c.id_parent IS NULL) -- Exclure les catégories avec id_parent = 1 ou 2
+        GROUP BY c.id_parent;");
+
+        return "<p>catégories compatibles ...</p>".json_encode($affiliatedProducts);
     }
 
     protected function saveFeatureCategory($categoryId, $featureId): bool
@@ -438,8 +452,23 @@ class Featurematching extends Module
 
     public function removeMatchCategoryAndProduct(int $categoryId, int $productId): bool
     {
-        return Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'category_product WHERE id_category = ' . (int) $categoryId . ' AND id_product = ' . (int) $productId);
+        PrestaShopLogger::addLog("appel de removematch avec categoryId: $categoryId, productId: $productId");
+
+        $sql = 'DELETE FROM ' . _DB_PREFIX_ . 'category_product WHERE id_category = ' . (int) $categoryId . ' AND id_product = ' . (int) $productId;
+        
+        PrestaShopLogger::addLog("SQL to execute: " . $sql);
+
+        $result = Db::getInstance()->execute($sql);
+
+        if (!$result) {
+            // Loguer l'erreur SQL
+            $error = Db::getInstance()->getMsgError();
+            PrestaShopLogger::addLog("Erreur SQL lors de la suppression: " . $error);
+        }
+
+        return (bool) $result;
     }
+
 
     public function isUsingNewTranslationSystem()
     {
