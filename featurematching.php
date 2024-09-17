@@ -377,15 +377,21 @@ class Featurematching extends Module
                 $groupedArray[$grandparentName] = [];
             }
 
-            // Générer les liens pour chaque catégorie
+            // Générer les liens pour chaque catégorie en les associant aux noms de catégories
             $categoryIds = explode(', ', $item['category_ids']);
-            $categoryLinks = [];
-            foreach ($categoryIds as $categoryId) {
-                $item['category_links'][] = $this->generateCategoryLink($categoryId);
+            $categoryNames = explode(', ', $item['category_names']);
+            
+            $categoryLinksWithNames = [];  // Tableau pour lier nom et lien
+
+            foreach ($categoryIds as $index => $categoryId) {
+                $categoryLink = $this->generateCategoryLink($categoryId);
+                $categoryLinksWithNames[] = [
+                    'name' => $categoryNames[$index],
+                    'link' => $categoryLink,
+                ];
             }
 
-            $categoryNames = explode(', ', $item['category_names']);
-            $item['category_names'] = $categoryNames;
+            $item['category_links'] = $categoryLinksWithNames;  // Associer le tableau généré
 
             // Ajouter l'élément dans le groupe correspondant
             $groupedArray[$grandparentName][] = $item;
