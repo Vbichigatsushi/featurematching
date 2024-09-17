@@ -379,15 +379,14 @@ class Featurematching extends Module
 
             // Générer les liens pour chaque catégorie
             $categoryIds = explode(', ', $item['category_ids']);
-
             $categoryLinks = [];
             foreach ($categoryIds as $categoryId) {
                 $item['category_links'][] = $this->generateCategoryLink($categoryId);
             }
 
             $categoryNames = explode(', ', $item['category_names'])
-            foreach ($categoryNames as $index => $categoryName) {
-                $item['category_names'][$index] = $categoryName;
+            foreach ($categoryNames as $categoryName) {
+                $item['category_names_array'][] = $categoryName;
             }
 
             // Ajouter l'élément dans le groupe correspondant
