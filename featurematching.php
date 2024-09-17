@@ -399,11 +399,7 @@ class Featurematching extends Module
 
     public function generateCategoryLink($categoryId)
     {
-        // get your category instance (from ObjectModel in this example)
-        $category = new Category($categoryId);
-
-        // get your category URL
-        $link = $context->link->getCategoryLink($category);
+        $link = $this->context->link->getCategoryLink($categoryId);
 
         return $link;
     }
