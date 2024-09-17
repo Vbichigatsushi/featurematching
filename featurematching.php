@@ -359,14 +359,16 @@ class Featurematching extends Module
         LEFT JOIN " . _DB_PREFIX_ . "category_lang parent_lang ON c_parent.id_category = parent_lang.id_category
         LEFT JOIN " . _DB_PREFIX_ . "category c_grandparent ON c_parent.id_parent = c_grandparent.id_category  -- Join pour le parent du parent
         LEFT JOIN " . _DB_PREFIX_ . "category_lang grandparent_lang ON c_grandparent.id_category = grandparent_lang.id_category  -- Langue du grandparent
-        WHERE p.id_product = 547
+        WHERE p.id_product = " . $productId . "
           AND c_lang.id_lang = 1  -- Langue à utiliser pour les catégories
           AND (parent_lang.id_lang = 1 OR parent_lang.id_lang IS NULL) -- Langue pour le parent
           AND (grandparent_lang.id_lang = 1 OR grandparent_lang.id_lang IS NULL) -- Langue pour le grandparent
           AND (c.id_parent NOT IN (1, 2) OR c.id_parent IS NULL) -- Exclure les catégories avec id_parent = 1 ou 2
         GROUP BY c.id_parent;");
 
-        return "<p>catégories compatibles ...</p>".json_encode($affiliatedProducts);
+        $this->context->smarty->assign('sqlReturn', json_encode($affiliatedProducts));
+
+        return $this->display(__FILE__, 'views/templates/front/moreProductDetails.tpl');
     }
 
     protected function saveFeatureCategory($categoryId, $featureId): bool
