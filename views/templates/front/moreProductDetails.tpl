@@ -9,13 +9,8 @@
 		            <tr>
 		                <td>{$categoryDetails['parent_name']}</td>
 		                <td>
-		                	{foreach from=$categoryDetails['category_names'] item=categoryName}
-		                		<p>{$categoryName}</p>
-		                	{/foreach}
-		                </td>
-		                <td>
-		                	{foreach from=$categoryDetails['category_links'] item=categoryLink}
-		                		<p>{$categoryLink}</p>
+		                	{foreach from=$categoryDetails['category_names'] key=index item=categoryName}
+		                		<a href="{$categoryDetails['category_links'][$index]}">{$categoryName}</a><br />
 		                	{/foreach}
 		                </td>
 		            </tr>
