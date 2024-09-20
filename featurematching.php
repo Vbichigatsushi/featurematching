@@ -299,8 +299,8 @@ class Featurematching extends Module
 
                             // Si la nouvelle caractéristique n'existe pas déjà, l'enregistrer pour le produit
                             if (!in_array($featureId, $oldFeatures)) {
-                                /*PrestaShopLogger::addLog("save product ");
-                                $this->saveFeatureProduct($productId, $featureId);*/
+                                PrestaShopLogger::addLog("save product ");
+                                $this->saveFeatureProduct($productId, $featureId);
                             }
                         }
                     }
@@ -315,8 +315,8 @@ class Featurematching extends Module
                 $categoriesToMatch = $this->getAllCategoryByFeature($featureId);
 
                 foreach ($categoriesToMatch as $categoryId) {
-                    /*PrestaShopLogger::addLog("ASSOC CAT : $categoryId, $productId");
-                    $this->matchCategoryAndProduct($categoryId, $productId);*/
+                    PrestaShopLogger::addLog("ASSOC CAT : $categoryId, $productId");
+                    $this->matchCategoryAndProduct($categoryId, $productId);
                 }
             }
         }
