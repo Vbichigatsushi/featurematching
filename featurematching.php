@@ -258,85 +258,119 @@ class Featurematching extends Module
     */
     protected function processProductFormData($params)
     {
+        // Récupération de l'identifiant du produit en tant qu'entier
         $productId = (int) $params['product']->id;
+        
+        // Récupération de tous les groupes de caractéristiques
         $featureGroups = $this->getAllFeatureGroup();
+        
+        // Récupération de toutes les valeurs des champs personnalisés du formulaire
         $customFields = Tools::getAllValues();
 
+        // Initialisation d'un tableau pour stocker les clés des groupes de caractéristiques
         $featureGroupKeys = [];
 
-        // Prepare an array of feature group keys
+        // Préparation d'un tableau contenant les noms des groupes de caractéristiques en minuscule
         foreach ($featureGroups as $group) {
             $featureGroupKeys[] = strtolower($group['name']);
         }
 
+        // Récupération des anciennes caractéristiques associées au produit
         $oldFeatures = $this->getProductFeatures($productId);
+        
+        // Initialisation d'un tableau pour les nouvelles caractéristiques
         $newFeatures = [];
 
+        // Vérification si des détails produits sont fournis et sont sous forme de tableau
         if (isset($customFields['product']['details']) && is_array($customFields['product']['details'])) {
+            
+            // Parcourir chaque sous-groupe de caractéristiques
             foreach ($customFields['product']['details'] as $subgroupKey => $subgroupValue) {
 
-                // Check if subgroupKey is a valid feature group
+                // Vérification si la clé du sous-groupe correspond à un groupe de caractéristiques valide
                 if (in_array(str_replace('-', ' ', $subgroupKey), $featureGroupKeys)) {
+                    
+                    // Si le sous-groupe est défini, traiter les caractéristiques sélectionnées
                     if (isset($customFields['product']['details'][$subgroupKey])) {
-
-                        // For each selected feature, save it
+                        
+                        // Pour chaque caractéristique sélectionnée, l'ajouter aux nouvelles caractéristiques
                         foreach ($customFields['product']['details'][$subgroupKey] as $featureId) {
-                            $newFeatures[] = $featureId;
+                            $newFeatures[] = (int) $featureId;
+
+                            // Si la nouvelle caractéristique n'existe pas déjà, l'enregistrer pour le produit
                             if (!in_array($featureId, $oldFeatures)) {
-                                PrestaShopLogger::addLog("save product ");
-                                $this->saveFeatureProduct($productId, $featureId);
+                                /*PrestaShopLogger::addLog("save product ");
+                                $this->saveFeatureProduct($productId, $featureId);*/
                             }
                         }
                     }
                 }
             }
 
+            // Récupérer à nouveau les caractéristiques du produit après modification
             $productFeatures = $this->getProductFeatures($productId);
 
+            // Pour chaque caractéristique du produit, associer les catégories correspondantes
             foreach ($productFeatures as $featureId) {
                 $categoriesToMatch = $this->getAllCategoryByFeature($featureId);
 
                 foreach ($categoriesToMatch as $categoryId) {
-                    PrestaShopLogger::addLog("ASSOC CAT : $categoryId, $productId");
-                    $this->matchCategoryAndProduct($categoryId, $productId);
+                    /*PrestaShopLogger::addLog("ASSOC CAT : $categoryId, $productId");
+                    $this->matchCategoryAndProduct($categoryId, $productId);*/
                 }
             }
         }
-        $featuresToRemove = array_diff($oldFeatures, $newFeatures);
-        PrestaShopLogger::addLog("feature id : ".json_encode($featuresToRemove));
 
+        // Journalisation des anciennes et nouvelles caractéristiques pour comparaison
+        PrestaShopLogger::addLog("old feature array for comparison : ".json_encode($oldFeatures));
+        PrestaShopLogger::addLog("new feature array for comparison: ".json_encode($newFeatures));
+
+        // Identification des caractéristiques à supprimer (présentes dans l'ancien mais pas dans le nouveau)
+        $featuresToRemove = array_diff($oldFeatures, $newFeatures);
+        PrestaShopLogger::addLog("deleted feature id : ".json_encode($featuresToRemove));
+
+        // Pour chaque caractéristique à supprimer, procéder à sa suppression
         foreach ($featuresToRemove as $featureId) {
             $this->removeFeatureProduct($productId, $featureId);
+
+            // Récupération des catégories liées à la caractéristique supprimée
             $categoriesToRemove = $this->getAllCategoryByFeature($featureId);
             PrestaShopLogger::addLog("catgoriestoremove : ".json_encode($categoriesToRemove));
 
+            // Pour chaque catégorie à supprimer, dissocier le produit de cette catégorie
             foreach ($categoriesToRemove as $categoryId) {
-                PrestaShopLogger::addLog("catid : ".$categoryId." , productid : ".$productId);
-                if (!$this->removeMatchCategoryAndProduct((int) $categoryId, (int) $productId)) {
+                PrestaShopLogger::addLog("catid to delete : ".$categoryId." , productid to delete : ".$productId);
 
+                // Si la suppression échoue, journaliser l'erreur
+                if (!$this->removeMatchCategoryAndProduct((int) $categoryId, (int) $productId)) {
                     PrestaShopLogger::addLog("failed to delete assoc : $categoryId, $productId");
                 }
             }
         }
     }
 
+
     public function hookActionCategoryAdd($params)
     {
+        PrestaShopLogger::addLog("actioncategoryadd");
         $this->processCategoryFormData($params);
     }
 
     public function hookActionCategoryUpdate($params)
     {
+        PrestaShopLogger::addLog("actioncategoryupdate");
         $this->processCategoryFormData($params);
     }
 
     public function hookActionProductAdd($params)
     {
+        PrestaShopLogger::addLog("actionproductadd");
         $this->processProductFormData($params);
     }
 
     public function hookActionProductUpdate($params)
     {
+        PrestaShopLogger::addLog("actionproductupdate");
         $this->processProductFormData($params);
     }
 
@@ -427,8 +461,41 @@ class Featurematching extends Module
 
     protected function removeFeatureProduct($productId, $featureId): bool
     {
-        return Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'fm_feature_product WHERE id_product = ' . (int) $productId . ' AND id_feature = ' . (int) $featureId);
+        // Ajout de log pour vérifier les paramètres passés
+        PrestaShopLogger::addLog("appel de removeFeatureProduct productId : ".$productId." / featureId : ".$featureId);
+
+        // Requête SQL de suppression
+        $sql = 'DELETE FROM ' . _DB_PREFIX_ . 'fm_feature_product WHERE id_product = ' . (int) $productId . ' AND id_feature = ' . (int) $featureId;
+        
+        // Loguer la requête SQL avant exécution
+        PrestaShopLogger::addLog("SQL to execute: " . $sql);
+
+        // Exécution de la requête
+        $result = Db::getInstance()->execute($sql);
+
+        // Vérification du résultat de la requête
+        if (!$result) {
+            // Loguer l'erreur SQL en cas d'échec
+            $error = Db::getInstance()->getMsgError();
+            PrestaShopLogger::addLog("Erreur SQL lors de la suppression: " . $error);
+            return false; // Retourner false si la suppression échoue
+        }
+
+        // Vérification si la suppression a bien eu lieu
+        $check = 'SELECT COUNT(*) FROM ' . _DB_PREFIX_ . 'fm_feature_product WHERE id_product = ' . (int) $productId . ' AND id_feature = ' . (int) $featureId;
+        $count = (int) Db::getInstance()->getValue($check);
+
+        // Si l'association existe toujours, loguer une erreur
+        if ($count > 0) {
+            PrestaShopLogger::addLog("La suppression a échoué: l'association entre le produit $productId et la caractéristique $featureId existe toujours.");
+            return false;
+        }
+
+        // Si tout s'est bien passé, retourner true
+        PrestaShopLogger::addLog("Suppression réussie pour le produit $productId et la caractéristique $featureId.");
+        return true;
     }
+
 
     protected function getCategoryFeatures(int $categoryId): array
     {
@@ -487,22 +554,41 @@ class Featurematching extends Module
 
     public function removeMatchCategoryAndProduct(int $categoryId, int $productId): bool
     {
-        PrestaShopLogger::addLog("appel de removematch avec categoryId: $categoryId, productId: $productId");
+        // Ajout de log pour vérifier les paramètres passés
+        PrestaShopLogger::addLog("appel de removeMatch avec categoryId: $categoryId, productId: $productId");
 
+        // Requête SQL de suppression
         $sql = 'DELETE FROM ' . _DB_PREFIX_ . 'category_product WHERE id_category = ' . (int) $categoryId . ' AND id_product = ' . (int) $productId;
         
+        // Loguer la requête SQL avant exécution
         PrestaShopLogger::addLog("SQL to execute: " . $sql);
 
+        // Exécution de la requête
         $result = Db::getInstance()->execute($sql);
 
+        // Vérification du résultat de la requête
         if (!$result) {
-            // Loguer l'erreur SQL
+            // Loguer l'erreur SQL en cas d'échec
             $error = Db::getInstance()->getMsgError();
             PrestaShopLogger::addLog("Erreur SQL lors de la suppression: " . $error);
+            return false; // Retourner false si la suppression échoue
         }
 
-        return (bool) $result;
+        // Vérification si la suppression a bien eu lieu
+        $check = 'SELECT COUNT(*) FROM ' . _DB_PREFIX_ . 'category_product WHERE id_category = ' . (int) $categoryId . ' AND id_product = ' . (int) $productId;
+        $count = (int) Db::getInstance()->getValue($check);
+
+        // Si le produit est toujours associé à la catégorie, loguer une erreur
+        if ($count > 0) {
+            PrestaShopLogger::addLog("La suppression a échoué: l'association entre la catégorie $categoryId et le produit $productId existe toujours.");
+            return false;
+        }
+
+        // Si tout s'est bien passé, retourner true
+        PrestaShopLogger::addLog("Suppression réussie pour la catégorie $categoryId et le produit $productId.");
+        return true;
     }
+
 
 
     public function isUsingNewTranslationSystem()
