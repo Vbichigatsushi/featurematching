@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file original="admin-dev" source-language="fr-FR" target-language="fr-FR" datatype="plaintext">
+  <file original="apb7w5hp3lofr8m" source-language="fr-FR" target-language="fr-FR" datatype="plaintext">
     <body>
       <trans-unit id="e05c962f022538707cde101c7419873d">
         <source>Feature group successfully added !</source>
@@ -62,6 +62,16 @@
         <target>Erreur durant l'ajout des caractéristiques !</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="2583a40f815d79bfa7b79dda0528819e">
+        <source>Success while deleting all feature from product !</source>
+        <target>Caractéristiques supprimées avec succès</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b8e9f79ae7aa43df9a0fbf944dea4c8b">
+        <source>Error while deleting all feature from product ! id not set.</source>
+        <target>Erreur durant la suppression des caractéristiques ! produit non choisi</target>
+        <note>Line: </note>
+      </trans-unit>
       <trans-unit id="e3023fb1f872e4c4794ae15a484fc812">
         <source>Feature Matching</source>
         <target>Association de caractéristiques</target>
@@ -75,6 +85,21 @@
       <trans-unit id="01da36bdc7136ee63b0c6ff9689576c6">
         <source>Are you sure ?</source>
         <target>Êtes-vous sur ?</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="0e805f2dcbd55120c9bd0174afcd2680">
+        <source>Delete all features from a product</source>
+        <target>Supprimer les caractéristiques d'un produit</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5651ccb645dfb63b60f697e1d71e17b2">
+        <source>Search by reference or name...</source>
+        <target>Chercher par référence, nom ou id...</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="dd1fd17165ab40b9c9401c263f28d89f">
+        <source>Delete features</source>
+        <target>Supprimer les caractéristiques</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="97effae9810eeb717f27d6b9c539f06a">

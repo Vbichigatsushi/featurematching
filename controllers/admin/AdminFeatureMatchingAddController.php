@@ -110,7 +110,7 @@ class AdminFeatureMatchingAddController extends ModuleAdminController
 
     public function displayAjaxSearchProduct()
     {
-        $query = Tools::getValue('query');
+        $query = trim(Tools::getValue('query'));
 
         if (!$query) {
             die(json_encode([]));
@@ -134,11 +134,11 @@ class AdminFeatureMatchingAddController extends ModuleAdminController
         $productId = Tools::getValue('idProductAllFeaturedeletion');
 
         if (isset($productId)) {
-            Db::getInstance()->execute("DELETE cp FROM ps_category_product cp
-                                    INNER JOIN ps_fm_feature_product fp ON fp.id_product = cp.id_product
-                                    INNER JOIN ps_fm_feature_category fc ON fc.id_category = cp.id_category
+            Db::getInstance()->execute("DELETE cp FROM " . _DB_PREFIX_ . "category_product cp
+                                    INNER JOIN " . _DB_PREFIX_ . "fm_feature_product fp ON fp.id_product = cp.id_product
+                                    INNER JOIN " . _DB_PREFIX_ . "fm_feature_category fc ON fc.id_category = cp.id_category
                                     WHERE fp.id_product = " . strval($productId));
-            Db::getInstance()->execute("DELETE fp FROM ps_fm_feature_product fp WHERE fp.id_product =".strval($productId));
+            Db::getInstance()->execute("DELETE fp FROM " . _DB_PREFIX_ . "fm_feature_product fp WHERE fp.id_product =".strval($productId));
 
             $this->ajaxDie(json_encode(['success' => true, 'message' => $this->trans("Success while deleting all feature from product !", [], 'Modules.Featurematching.Admin')]));
         }

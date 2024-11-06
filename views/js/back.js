@@ -421,7 +421,10 @@ function handleProductAllFeaturesDeletion() {
             if (response.success) {
                 hideLoader("00");
                 $.growl.notice({ title: "", message: response.message });
+                $('#search-results').empty();
+                $('#product-reference-search').val('');
             } else {
+                hideLoader("00");
                 $.growl.error({ title: "", message: response.message });
             }
         })
