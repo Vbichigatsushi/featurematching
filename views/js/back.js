@@ -357,3 +357,79 @@ function addAllSubFeatures(form) {
         console.error(response);
     });
 }
+
+function fetchProducts() {
+    const query = $('#product-reference-search').val();
+    console.log("Query:", query);
+    if (query.length > 0) { // Lancer la recherche si la requête est plus de 2 caractères
+        $.ajax({
+            type: "POST",
+            url: "index.php",
+            data: {
+                controller: "AdminFeatureMatchingAdd",
+                token: tokenAdminFeatureMatchingAdd,
+                action: "SearchProduct",
+                ajax: true,
+                query: query
+            },
+            dataType: "json",
+            success: function (data) {
+                const resultsContainer = $('#search-results');
+                resultsContainer.empty();
+
+                if (data.length) {
+                    data.forEach(function (product) {
+                        // Utiliser la concaténation au lieu des backticks
+                        const productItem = $('<option>').text(product.id_product + ' - ' + product.name + ' - ' + product.reference).val(product.id_product);
+                        resultsContainer.append(productItem);
+                    });
+                } else {
+                    resultsContainer.text('Aucun produit trouvé.');
+                }
+            },
+            error: function (error) {
+                console.error('Erreur lors de la recherche des produits:', error);
+            }
+        });
+    } else {
+        $('#search-results').empty(); // Effacer les résultats si la saisie est trop courte
+    }
+}
+
+function handleProductAllFeaturesDeletion() {
+    const selectedProductId = $('#search-results').val(); // Obtenir la valeur de l'option sélectionnée
+    if (selectedProductId) {
+        console.log("Produit sélectionné avec ID:", selectedProductId);
+        showLoader("00");
+
+        const postdata = {
+            controller: "AdminFeatureMatchingAdd",
+            ajax: true,
+            action: "HandleProductAllFeaturesDeletion",
+            token: tokenAdminFeatureMatchingAdd,
+            idProductAllFeaturedeletion: selectedProductId,
+        };
+
+        $.ajax({
+            type: "POST",
+            cache: false,
+            dataType: "json",
+            url: "index.php",
+            data: postdata,
+        })
+        .done(function (response) {
+            if (response.success) {
+                hideLoader("00");
+                $.growl.notice({ title: "", message: response.message });
+            } else {
+                $.growl.error({ title: "", message: response.message });
+            }
+        })
+        .fail(function (response) {
+            hideLoader("00");
+            console.error(response);
+        });
+    } else {
+        console.log("Aucun produit sélectionné");
+    }
+}

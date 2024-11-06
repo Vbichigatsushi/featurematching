@@ -107,4 +107,43 @@ class AdminFeatureMatchingAddController extends ModuleAdminController
             $this->ajaxDie(json_encode(['success' => false, 'message' => $this->trans("Failure adding all sub-features !", [], 'Modules.Featurematching.Admin')]));
         }
     }
+
+    public function displayAjaxSearchProduct()
+    {
+        $query = Tools::getValue('query');
+
+        if (!$query) {
+            die(json_encode([]));
+        }
+
+        // Requête pour rechercher les produits par référence
+        $sql = 'SELECT p.id_product, name, reference FROM ' . _DB_PREFIX_ . 'product_lang pl
+                INNER JOIN ' . _DB_PREFIX_ . 'product p ON pl.id_product = p.id_product
+                INNER JOIN ' . _DB_PREFIX_ . 'fm_feature_product fpf ON fpf.id_product = p.id_product
+                WHERE pl.id_lang = ' . (int)$this->context->language->id . '
+                AND (p.reference LIKE "%' . pSQL($query) . '%" OR pl.name LIKE "%' . pSQL($query) . '%" OR p.id_product LIKE "%' . pSQL($query) . '%")';
+
+        $products = Db::getInstance()->executeS($sql);
+
+        // Renvoie les résultats en JSON
+        die(json_encode($products));
+    }
+
+    public function displayAjaxHandleProductAllFeaturesDeletion()
+    {
+        $productId = Tools::getValue('idProductAllFeaturedeletion');
+
+        if (isset($productId)) {
+            Db::getInstance()->execute("DELETE cp FROM ps_category_product cp
+                                    INNER JOIN ps_fm_feature_product fp ON fp.id_product = cp.id_product
+                                    INNER JOIN ps_fm_feature_category fc ON fc.id_category = cp.id_category
+                                    WHERE fp.id_product = " . strval($productId));
+            Db::getInstance()->execute("DELETE fp FROM ps_fm_feature_product fp WHERE fp.id_product =".strval($productId));
+
+            $this->ajaxDie(json_encode(['success' => true, 'message' => $this->trans("Success while deleting all feature from product !", [], 'Modules.Featurematching.Admin')]));
+        }
+        else{
+            $this->ajaxDie(json_encode(['success' => false, 'message' => $this->trans("Error while deleting all feature from product ! id not set.", [], 'Modules.Featurematching.Admin')]));
+        }  
+    }
 }

@@ -1,6 +1,25 @@
 <form action="" method="POST">
     <div class="panel" id="fieldset_0" style="position: relative;">
         <div class="panel-heading">
+            <i class="icon-close"></i> {l s="Delete all features from a product" d='Modules.Featurematching.Admin'}
+        </div>
+        <div class="loader-container loaderId_00" style="display:none;">
+            <span class="loader"></span>
+        </div>
+        <div style="display:flex;flex-direction: row;justify-content: space-between;align-items: center;gap: 20px;">
+        	<div style="display:flex;flex-direction: row;width:85%;gap: 20px;">
+        		<input type="text" id="product-reference-search" oninput="fetchProducts()" placeholder="{l s='Search by reference or name...' d='Modules.Featurematching.Admin'}">
+				<select id="search-results"></select>
+			</div>
+        	<button class="btn btn-danger" onclick="handleProductAllFeaturesDeletion()" type="button" style="display:flex;align-items: center;justify-content: left;border: none;">
+				{l s="Delete features" d='Modules.Featurematching.Admin'}<span class="material-icons">delete</span>
+			</button>
+		</div>
+    </div>
+</form>
+<form action="" method="POST">
+    <div class="panel" id="fieldset_0" style="position: relative;">
+        <div class="panel-heading">
             <i class="icon-edit"></i> {l s="Feature groups" d='Modules.Featurematching.Admin'}
         </div>
         <div class="loader-container loaderId_0" style="display:none;">
