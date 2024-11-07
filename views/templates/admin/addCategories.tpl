@@ -7,7 +7,7 @@
             <span class="loader"></span>
         </div>
         <div style="display:flex;flex-direction: row;justify-content: space-between;align-items: center;gap: 20px;">
-        	<div style="display:flex;flex-direction: row;width:85%;gap: 20px;">
+        	<div style="display:flex;flex-direction: row;width:83%;gap: 20px;">
         		<input type="text" id="product-reference-search" oninput="fetchProducts()" placeholder="{l s='Search by reference or name...' d='Modules.Featurematching.Admin'}">
 				<select id="search-results"></select>
 			</div>

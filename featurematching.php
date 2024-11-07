@@ -183,7 +183,7 @@ class Featurematching extends Module
         $savedFeatures = $this->getProductFeatures($productId);
         $featureGroups = $this->getAllFeatureGroup();
 
-        $productFormModifier->modify(
+        $productFormModifier->modify2(
             $productId,
             $params['form_builder'],
             $featureGroups,
